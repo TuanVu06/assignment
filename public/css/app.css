@@ -1,0 +1,147 @@
+/* Header */
+header {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-nav .nav-link {
+    padding: 10px 15px;
+    transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #007bff !important;
+}
+
+.navbar-nav .nav-link.active {
+    font-weight: bold;
+    color: #007bff !important;
+}
+
+.text-muted {
+    font-size: 0.9rem;
+}
+
+/* Featured Post */
+.featured-post {
+    transition: transform 0.3s, box-shadow 0.3s;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+}
+
+.featured-post:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.featured-post .card-title a {
+    color: #1a1a1a;
+    transition: color 0.3s;
+}
+
+.featured-post .card-title a:hover {
+    color: #007bff;
+}
+
+.featured-post .card-text {
+    color: #555;
+}
+
+/* Post Card */
+.post-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+}
+
+.post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15) !important;
+}
+
+.post-card .card-img-top {
+    transition: transform 0.3s;
+}
+
+.post-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.post-card .card-title a {
+    color: #1a1a1a;
+    transition: color 0.3s;
+}
+
+.post-card .card-title a:hover {
+    color: #007bff;
+}
+
+.post-card .card-text {
+    color: #555;
+}
+
+/* General */
+h2 {
+    font-weight: 700;
+    color: #333;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.badge {
+    font-size: 0.8rem;
+    padding: 5px 10px;
+}
+
+/* Login Page Styles */
+.login-card {
+    border: none;
+    border-radius: 10px;
+    margin-top: 5rem;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.login-card:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+    transform: translateY(-1px);
+}
+
+.form-control:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.invalid-feedback {
+    display: none;
+    width: 100%;
+    margin-top: 0.25rem;
+    font-size: 0.875em;
+    color: #dc3545;
+}
+
+.was-validated .form-control:invalid ~ .invalid-feedback {
+    display: block;
+}
+
+/* Responsive adjustments */
+@media (max-width: 576px) {
+    .login-card {
+        margin-top: 2rem;
+    }
+}
