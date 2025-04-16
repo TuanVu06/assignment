@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'is_admin'
     ];
 
     /**
@@ -43,6 +44,14 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_admin' => 'boolean',    // 👉 Thêm dòng này
         ];
+    }
+
+    // Kiểm tra xem người dùng có phải admin không
+    public function isAdmin()
+    {
+        // return $this->is_admin === '1';
+        return $this->is_admin;
     }
 }

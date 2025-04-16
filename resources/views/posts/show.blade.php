@@ -9,7 +9,7 @@
             <div class="card shadow-sm">
                 <!-- Hiển thị hình ảnh -->
                 @if($post->image)
-                <img src="{{ asset($post->image) }}" class="card-img-top" alt="{{ $post->title }}" style="max-height: 400px; object-fit: cover;">
+                <img src="{{ asset('storage/' .$post->image) }}" class="card-img-top" alt="{{ $post->title }}" style="max-height: 400px; object-fit: cover;">
                 @else
                 {{-- <img src="{{ asset('images/default-post.jpg') }}" class="card-img-top" alt="Default post image" style="max-height: 400px; object-fit: cover;"> --}}
                 @endif
@@ -17,6 +17,9 @@
                 <div class="card-body">
                     <!-- Tiêu đề bài viết -->
                     <h1 class="card-title mb-3">{{ $post->title }}</h1>
+
+                    <!-- Summary bài viết -->
+                    <p class="text-muted mb-4">{{ $post->summary }}</p>
                     
                     <!-- Thông tin meta -->
                     <div class="d-flex justify-content-between align-items-center mb-4">

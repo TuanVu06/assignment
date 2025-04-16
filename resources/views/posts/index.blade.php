@@ -11,7 +11,7 @@
                 <div class="row g-0">
                     @if ($featuredPost->image)
                         <div class="col-md-4">
-                            <img src="{{ asset($featuredPost->image) }}" class="img-fluid rounded-start" alt="{{ $featuredPost->title }}" style="object-fit: cover; height: 100%;">
+                            <img src="{{ asset('storage/' .$featuredPost->image) }}" class="img-fluid rounded-start" alt="{{ $featuredPost->title }}" style="object-fit: cover; height: 100%;">
                         </div>
                     @endif
                     <div class="col-md-{{ $featuredPost->image ? '8' : '12' }}">
@@ -47,7 +47,7 @@
                     <div class="col-md-4 mb-4">
                         <div class="card shadow-sm border-0 rounded-3 h-100 post-card">
                             @if ($post->image)
-                                <img src="{{ asset($post->image) }}" class="card-img-top rounded-top" alt="{{ $post->title }}" style="height: 200px; object-fit: cover;">
+                                <img src="{{ asset('storage/' .$post->image) }}" class="card-img-top rounded-top" alt="{{ $post->title }}" style="height: 200px; object-fit: cover;">
                             @endif
                             <div class="card-body">
                                 <h5 class="card-title">

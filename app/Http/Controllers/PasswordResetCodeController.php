@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use App\Mail\ResetPasswordCodeMail;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cookie;
 
 class PasswordResetCodeController extends Controller
 {
@@ -41,7 +42,10 @@ class PasswordResetCodeController extends Controller
 
         } catch (\Exception $e) {
             Log::error('Send reset code error: '.$e->getMessage());
-            return back()->with('error', 'Có lỗi xảy ra khi gửi mã xác nhận');
+            return back()
+                ->withInput()
+                ->with('email', $request->email)
+                ->with('error', 'Có lỗi xảy ra khi gửi mã xác nhận.');
         }
     }
 
@@ -75,23 +79,46 @@ class PasswordResetCodeController extends Controller
                     ->with('email', $request->email);
             }
 
-            return redirect()->route('password.new.form')
-                ->with('email', $request->email)
-                ->with('success', 'Xác thực thành công, vui lòng đặt mật khẩu mới');
+            // Lưu token vào cookie (hết hạn sau 30 phút, khớp với thời gian sống của token)
+            return redirect()->route('password.new.form', ['token' => $reset->token])
+                ->with('success', 'Xác thực thành công, vui lòng đặt mật khẩu mới.')
+                ->cookie('reset_token', $reset->token, 30);
 
         } catch (\Exception $e) {
             Log::error('Verify code error: '.$e->getMessage());
-            return back()->with('error', 'Có lỗi xảy ra khi xác thực mã');
+            return redirect()->route('password.code.form')
+                ->withInput()
+                ->with('email', $request->email)
+                ->with('error', 'Có lỗi xảy ra khi xác thực mã.');
         }
     }
 
     // Hiển thị form đặt mật khẩu mới
     public function showNewPasswordForm()
     {
-        if (!session('email')) {
-            return redirect()->route('password.request')->with('error', 'Vui lòng xác thực email trước');
+        // Lấy token từ URL, cookie, hoặc hidden input
+        $token = Cookie::get('reset_token');
+        if (!$token) {
+            return redirect()->route('password.request')
+                ->with('error', 'Phiên xác thực không hợp lệ. Vui lòng bắt đầu lại.');
         }
-        return view('auth.new-password');
+
+        // Lấy email từ bảng password_reset_tokens dựa trên token
+        $reset = DB::table('password_reset_tokens')
+            ->where('token', $token)
+            ->where('created_at', '>', Carbon::now()->subMinutes(30))
+            ->first();
+
+            if (!$reset) {
+                // Xóa cookie nếu token không hợp lệ
+                Cookie::queue(Cookie::forget('reset_token'));
+                return redirect()->route('password.request')
+                    ->with('error', 'Phiên xác thực đã hết hạn. Vui lòng bắt đầu lại.');
+            }
+    
+            $email = $reset->email;
+    
+            return view('auth.new-password', compact('email', 'token'));
     }
 
     // Xử lý đổi mật khẩu
@@ -100,20 +127,32 @@ class PasswordResetCodeController extends Controller
         $request->validate([
             'email' => 'required|email|exists:users,email',
             'password' => 'required|min:8|confirmed',
+            'token' => 'required',
+        ], [
+            'email.required' => 'Vui lòng nhập email.',
+            'email.email' => 'Email không đúng định dạng.',
+            'email.exists' => 'Email không tồn tại trong hệ thống.',
+            'password.required' => 'Vui lòng nhập mật khẩu.',
+            'password.min' => 'Mật khẩu phải có ít nhất 8 ký tự.',
+            'password.confirmed' => 'Xác nhận mật khẩu không khớp.',
+            'token.required' => 'Phiên xác thực không hợp lệ.',
         ]);
     
         try {
-            // Kiểm tra xem email có trong bảng reset không
-            $exists = DB::table('password_reset_tokens')
+            // Kiểm tra token và email trong bảng reset
+            $reset = DB::table('password_reset_tokens')
                 ->where('email', $request->email)
-                ->exists();
+                ->where('token', $request->token)
+                ->where('created_at', '>', Carbon::now()->subMinutes(30))
+                ->first();
     
-            if (!$exists) {
-                return redirect()->route('password.new.form')
-                    ->withInput() // Giữ lại input cũ
-                    ->with('email', $request->email) // Giữ lại email
-                    ->with('error', 'Phiên đặt lại mật khẩu không hợp lệ');
-            }
+                if (!$reset) {
+                    // Xóa cookie nếu token không hợp lệ
+                    Cookie::queue(Cookie::forget('reset_token'));
+                    return redirect()->route('password.new.form', ['token' => $request->token])
+                        ->withInput()
+                        ->with('error', 'Phiên đặt lại mật khẩu không hợp lệ.');
+                }
     
             // Cập nhật mật khẩu
             User::where('email', $request->email)
@@ -124,8 +163,8 @@ class PasswordResetCodeController extends Controller
                 ->where('email', $request->email)
                 ->delete();
     
-            // Xóa session
-            $request->session()->forget(['email']);
+            // Xóa cookie reset_token
+            Cookie::queue(Cookie::forget('reset_token'));
     
             // Chuyển hướng về login với thông báo
             return redirect()->route('login')
@@ -135,7 +174,7 @@ class PasswordResetCodeController extends Controller
             Log::error('Reset password error: '.$e->getMessage());
             return redirect()->route('password.new.form')
                 ->withInput() // Giữ lại input cũ
-                ->with('email', $request->email) // Giữ lại email
+                // ->with('email', $request->email) // Giữ lại email
                 ->with('error', 'Có lỗi xảy ra khi đặt lại mật khẩu: '.$e->getMessage());
         }
     }

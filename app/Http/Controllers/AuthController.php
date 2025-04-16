@@ -59,7 +59,7 @@ class AuthController extends Controller
         if (Auth::attempt($credentials)) {
             // Đăng nhập thành công
             $request->session()->regenerate();
-            return redirect()->intended('/dashboard')->with('success', 'Đăng nhập thành công!');
+            return redirect()->intended('/')->with('success', 'Đăng nhập thành công!');
         }
 
         // Đăng nhập thất bại

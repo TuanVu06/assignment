@@ -22,7 +22,7 @@
                     @endif
 
                     <!-- Validation Errors -->
-                    @if ($errors->any())
+                    {{-- @if ($errors->any())
                         <div class="alert alert-danger" role="alert">
                             <ul class="mb-0">
                                 @foreach ($errors->all() as $error)
@@ -30,15 +30,19 @@
                                 @endforeach
                             </ul>
                         </div>
-                    @endif
+                    @endif --}}
 
                     <!-- Verification Form -->
                     <form method="POST" action="{{ route('password.code.verify') }}">
                         @csrf
-                        <input type="hidden" name="email" value="{{ session('email') }}">
-                        
                         <div class="mb-3">
-                            <p class="form-control-static">Email: <strong>{{ session('email') }}</strong></p>
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" name="email" id="email"
+                                class="form-control @error('email') is-invalid @enderror"
+                                value="{{ old('email', session('email') ?? '') }}" readonly  required>
+                            @error('email')
+                                <div class="invalid-feedback">{{ $message }}</div>
+                            @enderror
                         </div>
                         
                         <div class="mb-3">
